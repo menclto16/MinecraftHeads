@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -26,19 +27,25 @@ namespace MinecraftHeads
                 var response = await request.Content.ReadAsStringAsync();
                 dynamic values = jsonHandler.DeserializeJsonString(response);
                 string uuid = values.id;
-                GetImage(uuid);
+                if (uuid != null) await GetImage(uuid);
             }
         }
 
         public async Task GetImage(string uuid)
         {
             var request = await client.GetAsync(headImgApi + uuid);
+            var response = await request.Content.ReadAsStreamAsync();
 
-
-            if (request.StatusCode == HttpStatusCode.OK)
+            using (var stream = new MemoryStream())
             {
-                var response = await request.Content.ReadAsStringAsync();
-                dynamic values = jsonHandler.DeserializeJsonString(response);
+                byte[] buffer = new byte[2048]; // read in chunks of 2KB
+                int bytesRead;
+                while ((bytesRead = response.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    stream.Write(buffer, 0, bytesRead);
+                }
+                byte[] result = stream.ToArray();
+                File.WriteAllBytes(uuid + ".png", result);
             }
         }
     }
