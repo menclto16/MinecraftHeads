@@ -8,19 +8,21 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <StackPanel>
-            <StackPanel Width="200">
-                <TextBox x:Name="Username"></TextBox>
-                <Button Click="GetSkin">Get</Button>
+        <DockPanel HorizontalAlignment="Stretch">
+            <StackPanel>
+                <StackPanel Width="200">
+                    <TextBox x:Name="Username"></TextBox>
+                    <Button Click="GetSkin">Get</Button>
+                </StackPanel>
+                <StackPanel Width="200">
+                    <TextBox x:Name="LoginField"></TextBox>
+                    <PasswordBox x:Name="PasswordField"></PasswordBox>
+                    <Button Click="Login">Login</Button>
+                    <Button Name="btnOpenFile" Click="btnOpenFile_Click">Open file</Button>
+                    <Button Click="ChangeSkin">Change Skin</Button>
+                </StackPanel>
             </StackPanel>
-            <StackPanel Width="200">
-                <TextBox x:Name="LoginField"></TextBox>
-                <PasswordBox x:Name="PasswordField"></PasswordBox>
-                <Button Click="Login">Login</Button>
-                <Button Name="btnOpenFile" Click="btnOpenFile_Click">Open file</Button>
-                <Button Click="ChangeSkin">Change Skin</Button>
-            </StackPanel>
-        </StackPanel>
-        <WrapPanel x:Name="HeadList"></WrapPanel>
+            <Image x:Name="SkinPreview" HorizontalAlignment="Center"></Image>
+        </DockPanel>
     </Grid>
 </Controls:MetroWindow>
