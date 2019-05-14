@@ -6,6 +6,9 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using MojangSharp;
+using MojangSharp.Endpoints;
+using MojangSharp.Responses;
 
 namespace MinecraftHeads
 {
@@ -13,6 +16,7 @@ namespace MinecraftHeads
     {
         HttpClient client = new HttpClient();
         JsonHandler jsonHandler = new JsonHandler();
+        AuthenticateResponse auth;
 
         private string uuidApi = "https://api.minetools.eu/uuid/";
         private string headImgApi = "https://crafatar.com/avatars/";
@@ -46,6 +50,29 @@ namespace MinecraftHeads
                 }
                 byte[] result = stream.ToArray();
                 File.WriteAllBytes(uuid + ".png", result);
+            }
+        }
+
+        public async void Login(string login, string password)
+        {
+            auth = await new Authenticate(new Credentials() { Username = login, Password = password }).PerformRequestAsync();
+            SecureConnection();
+        }
+
+        private async void SecureConnection()
+        {
+            Response response = await new SecureIP(auth.AccessToken).PerformRequestAsync();
+        }
+
+        public async void ChangeSkin(FileInfo skinPath)
+        {
+            Response skinUpload = await new UploadSkin(auth.AccessToken, auth.SelectedProfile.Value, skinPath).PerformRequestAsync();
+            if (skinUpload.IsSuccess)
+            {
+                Console.WriteLine("Successfully changed skin.");
+            }
+            else
+            { // Handle your errors }
             }
         }
     }
