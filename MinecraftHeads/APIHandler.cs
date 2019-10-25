@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 
 namespace MinecraftHeads
 {
-    class APIHandler
+    public class APIHandler
     {
         private HttpClient client = new HttpClient();
         private JsonHandler jsonHandler = new JsonHandler();

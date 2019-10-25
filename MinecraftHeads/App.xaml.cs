@@ -13,5 +13,6 @@ namespace MinecraftHeads
     /// </summary>
     public partial class App : Application
     {
+        public static APIHandler APIHandlerObject = new APIHandler();
     }
 }

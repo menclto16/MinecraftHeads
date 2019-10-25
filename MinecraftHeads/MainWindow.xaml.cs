@@ -30,17 +30,12 @@ namespace MinecraftHeads
         public MainWindow()
         {
             InitializeComponent();
+            MainFrame.Navigate(new LoginPage());
         }
 
         private async void GetSkin(object sender, RoutedEventArgs e)
         {
             //Image image = await apiHandler.GetSkin(Username.Text);
-            //SkinPreview.Source = image.Source;
-        }
-
-        private async void Login(object sender, RoutedEventArgs e)
-        {
-            Image image = await apiHandler.Login(LoginField.Text, PasswordField.Password);
             //SkinPreview.Source = image.Source;
         }
 
