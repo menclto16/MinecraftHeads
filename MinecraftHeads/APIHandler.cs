@@ -49,7 +49,7 @@ namespace MinecraftHeads
 
         public async Task<Image> GetImage(string uuid)
         {
-            var request = await client.GetAsync(headImgApi + uuid);
+            var request = await client.GetAsync(headImgApi + uuid + "?size=512&default=MHF_Steve&overlay");
             var response = await request.Content.ReadAsStreamAsync();
 
             using (var stream = new MemoryStream())

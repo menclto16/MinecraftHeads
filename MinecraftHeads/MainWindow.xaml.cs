@@ -34,14 +34,14 @@ namespace MinecraftHeads
 
         private async void GetSkin(object sender, RoutedEventArgs e)
         {
-            Image image = await apiHandler.GetSkin(Username.Text);
-            SkinPreview.Source = image.Source;
+            //Image image = await apiHandler.GetSkin(Username.Text);
+            //SkinPreview.Source = image.Source;
         }
 
         private async void Login(object sender, RoutedEventArgs e)
         {
             Image image = await apiHandler.Login(LoginField.Text, PasswordField.Password);
-            SkinPreview.Source = image.Source;
+            //SkinPreview.Source = image.Source;
         }
 
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
@@ -55,7 +55,7 @@ namespace MinecraftHeads
         private async void ChangeSkin(object sender, RoutedEventArgs e)
         {
             Image image = await apiHandler.ChangeSkin(skinPath);
-            SkinPreview.Source = image.Source;
+            //SkinPreview.Source = image.Source;
         }
     }
 }
