@@ -5,16 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
+using MinecraftHeads.Responses;
 
 namespace MinecraftHeads
 {
     class FileHandler
     {
-        public void SaveLogin(Login login)
+        public void SaveLogin(string login)
         {
-            string json = JsonConvert.SerializeObject(login);
-
-            File.WriteAllText("login.json", json);
+            File.WriteAllText("login.json", login);
         }
 
         public Login GetLogin()
@@ -25,7 +24,14 @@ namespace MinecraftHeads
 
                 return JsonConvert.DeserializeObject<Login>(jsonFromFile);
             }
-            else return new Login();
+            else return null;
+        }
+        public void ClearLogin()
+        {
+            if (File.Exists("login.json"))
+            {
+                File.Delete("login.json");
+            }
         }
 
         public Login DeserializeJsonString(string json)

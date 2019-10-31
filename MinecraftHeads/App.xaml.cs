@@ -14,5 +14,7 @@ namespace MinecraftHeads
     public partial class App : Application
     {
         public static APIHandler APIHandlerObject = new APIHandler();
+        public static LoginPage LoginPageObject = new LoginPage();
+        public static MainPage MainPageObject = new MainPage();
     }
 }

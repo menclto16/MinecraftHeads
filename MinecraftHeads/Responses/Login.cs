@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MinecraftHeads
+namespace MinecraftHeads.Responses
 {
     class Login
     {
-        public string AccessToken { get; set; }
-        public string ClientToken { get; set; }
+        public string accessToken { get; set; }
+        public string clientToken { get; set; }
     }
 }

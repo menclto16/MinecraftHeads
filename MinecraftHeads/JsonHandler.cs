@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MinecraftHeads.Responses;
 
 namespace MinecraftHeads
 {
@@ -11,7 +12,12 @@ namespace MinecraftHeads
     {
         public object DeserializeJsonString(string json)
         {
-            return JsonConvert.DeserializeObject(json);
+            return JsonConvert.DeserializeObject<Login>(json);
+        }
+
+        public string SerializeJsonString(object jsonObject)
+        {
+            return JsonConvert.SerializeObject(jsonObject);
         }
     }
 }

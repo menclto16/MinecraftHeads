@@ -24,5 +24,13 @@ namespace MinecraftHeads
         {
             InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (App.APIHandlerObject.Invalidate() == "")
+            {
+                ((MainWindow)Application.Current.MainWindow).MainFrame.Navigate(App.LoginPageObject);
+            }
+        }
     }
 }

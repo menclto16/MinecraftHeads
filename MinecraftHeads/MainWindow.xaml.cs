@@ -30,7 +30,7 @@ namespace MinecraftHeads
         public MainWindow()
         {
             InitializeComponent();
-            MainFrame.Navigate(new LoginPage());
+            checkLogin();
         }
 
         private async void GetSkin(object sender, RoutedEventArgs e)
@@ -51,6 +51,17 @@ namespace MinecraftHeads
         {
             Image image = await apiHandler.ChangeSkin(skinPath);
             //SkinPreview.Source = image.Source;
+        }
+        private void checkLogin()
+        {
+            if (App.APIHandlerObject.LoggedIn)
+            {
+                MainFrame.Navigate(App.MainPageObject);
+            }
+            else
+            {
+                MainFrame.Navigate(App.LoginPageObject);
+            }
         }
     }
 }

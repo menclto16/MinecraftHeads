@@ -11,25 +11,46 @@ using MojangSharp.Endpoints;
 using MojangSharp.Responses;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using MinecraftHeads.Responses;
+using Newtonsoft.Json;
 
 namespace MinecraftHeads
 {
     public class APIHandler
     {
-        private HttpClient client = new HttpClient();
+        public bool LoggedIn = false;
+
+        private static readonly HttpClient client = new HttpClient();
         private JsonHandler jsonHandler = new JsonHandler();
         private FileHandler fileHandler = new FileHandler();
         private AuthenticateResponse auth;
-        private Login login;
+        private Login loginObject;
 
         private string uuidApi = "https://api.minetools.eu/uuid/";
         private string headImgApi = "https://crafatar.com/renders/body/";
 
         public APIHandler()
         {
-            login = fileHandler.GetLogin();
+            loginObject = fileHandler.GetLogin();
+            validateLogin();
         }
-
+        private void validateLogin()
+        {
+            if (loginObject != null)
+            {
+                if (Validate() == "")
+                {
+                    LoggedIn = true;
+                }
+                else if (Refresh() != null)
+                {
+                    if (Validate() == "")
+                    {
+                        LoggedIn = true;
+                    }
+                }
+            }
+        }
         public async Task<Image> GetSkin(string name)
         {
             var request = await client.GetAsync(uuidApi + name);
@@ -68,12 +89,117 @@ namespace MinecraftHeads
             }
         }
 
-        public async Task<Image> Login(string login, string password)
+        public string Login(string login, string password)
         {
-            auth = await new Authenticate(new Credentials() { Username = login, Password = password }).PerformRequestAsync();
-            return await GetImage(auth.SelectedProfile.Value);
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.username = login;
+            loginRequest.password = password;
+            loginRequest.clientToken = Guid.NewGuid().ToString();
+
+            string requestString = JsonConvert.SerializeObject(loginRequest);
+            
+
+            var request = HttpWebRequest.Create("https://authserver.mojang.com/authenticate");
+            var byteData = Encoding.ASCII.GetBytes(requestString);
+            request.ContentType = "application/json";
+            request.Method = "POST";
+
+            try
+            {
+                using (var stream = request.GetRequestStream())
+                {
+                    stream.Write(byteData, 0, byteData.Length);
+                }
+                var response = (HttpWebResponse)request.GetResponse();
+                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                fileHandler.SaveLogin(responseString);
+                loginObject = (Login)jsonHandler.DeserializeJsonString(responseString);
+                return responseString;
+            }
+            catch (WebException e)
+            {
+                return e.ToString();
+            }
         }
 
+        public string Validate()
+        {
+            string requestString = JsonConvert.SerializeObject(loginObject);
+
+            var request = HttpWebRequest.Create("https://authserver.mojang.com/validate");
+            var byteData = Encoding.ASCII.GetBytes(requestString);
+            request.ContentType = "application/json";
+            request.Method = "POST";
+
+            try
+            {
+                using (var stream = request.GetRequestStream())
+                {
+                    stream.Write(byteData, 0, byteData.Length);
+                }
+                var response = (HttpWebResponse)request.GetResponse();
+                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                return responseString;
+            }
+            catch (WebException e)
+            {
+                return e.ToString();
+            }
+        }
+        public string Refresh()
+        {
+            string requestString = JsonConvert.SerializeObject(loginObject);
+
+            var request = HttpWebRequest.Create("https://authserver.mojang.com/refresh");
+            var byteData = Encoding.ASCII.GetBytes(requestString);
+            request.ContentType = "application/json";
+            request.Method = "POST";
+
+            try
+            {
+                using (var stream = request.GetRequestStream())
+                {
+                    stream.Write(byteData, 0, byteData.Length);
+                }
+                var response = (HttpWebResponse)request.GetResponse();
+                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                fileHandler.SaveLogin(responseString);
+                return responseString;
+            }
+            catch (WebException e)
+            {
+                return e.ToString();
+            }
+        }
+        public string Invalidate()
+        {
+            string requestString = JsonConvert.SerializeObject(loginObject);
+
+            var request = HttpWebRequest.Create("https://authserver.mojang.com/invalidate");
+            var byteData = Encoding.ASCII.GetBytes(requestString);
+            request.ContentType = "application/json";
+            request.Method = "POST";
+
+            try
+            {
+                using (var stream = request.GetRequestStream())
+                {
+                    stream.Write(byteData, 0, byteData.Length);
+                }
+                var response = (HttpWebResponse)request.GetResponse();
+                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                fileHandler.ClearLogin();
+                return responseString;
+            }
+            catch (WebException e)
+            {
+                return e.ToString();
+            }
+        }
         private async void SecureConnection()
         {
             Response response1 = await new Challenges(auth.AccessToken).PerformRequestAsync();

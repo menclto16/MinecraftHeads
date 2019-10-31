@@ -24,9 +24,12 @@ namespace MinecraftHeads
         {
             InitializeComponent();
         }
-        private async void Login(object sender, RoutedEventArgs e)
+        private void login(object sender, RoutedEventArgs e)
         {
-            Image image = await App.APIHandlerObject.Login(LoginField.Text, PasswordField.Password);
+            if (App.APIHandlerObject.Login(LoginField.Text, PasswordField.Password) != null)
+            {
+                ((MainWindow)Application.Current.MainWindow).MainFrame.Navigate(App.MainPageObject);
+            }
         }
     }
 }
