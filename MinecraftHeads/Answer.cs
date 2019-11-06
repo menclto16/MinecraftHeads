@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MinecraftHeads.Responses
+namespace MinecraftHeads
 {
-    class ChallangesResponse
+    public class Answer
     {
+        public int id { get; set; }
+        public string answer { get; set; }
     }
 }

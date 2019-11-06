@@ -56,7 +56,9 @@ namespace MinecraftHeads
         {
             if (App.APIHandlerObject.LoggedIn)
             {
+                App.MainPageObject.ShowSkin();
                 MainFrame.Navigate(App.MainPageObject);
+                App.MainPageObject.ShowQuestions();
             }
             else
             {
