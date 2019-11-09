@@ -24,11 +24,27 @@ namespace MinecraftHeads
         {
             InitializeComponent();
         }
-        private void login(object sender, RoutedEventArgs e)
+        private void login()
         {
             if (App.APIHandlerObject.Login(LoginField.Text, PasswordField.Password) != null)
             {
                 ((MainWindow)Application.Current.MainWindow).MainFrame.Navigate(App.MainPageObject);
+            }
+            else
+            {
+                MessageLabel.Text = "Login failed.\nPlease check your credentials or try again later.";
+                MessageLabel.Foreground = Brushes.Red;
+            }
+        }
+        private void loginButtonPress(object sender, RoutedEventArgs e)
+        {
+            login();
+        }
+        private void textBoxKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                login();
             }
         }
     }

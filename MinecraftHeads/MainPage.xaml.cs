@@ -28,7 +28,11 @@ namespace MinecraftHeads
         {
             InitializeComponent();
         }
-
+        public void UpdatePage()
+        {
+            ShowSkin();
+            if (!App.APIHandlerObject.IsSecure()) ShowQuestions();
+        }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (App.APIHandlerObject.Invalidate() == "")
@@ -36,7 +40,6 @@ namespace MinecraftHeads
                 ((MainWindow)Application.Current.MainWindow).MainFrame.Navigate(App.LoginPageObject);
             }
         }
-
         public async void ShowSkin()
         {
             Image image = await App.APIHandlerObject.GetImage();
@@ -65,6 +68,7 @@ namespace MinecraftHeads
             answers[2].answer = Answer3.Text;
             answers[2].id = questions[2].answer.id;
             App.APIHandlerObject.SendQuestions(answers);
+            UpdatePage();
         }
     }
 }

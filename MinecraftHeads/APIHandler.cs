@@ -51,8 +51,28 @@ namespace MinecraftHeads
                 }
             }
         }
-        public async Task<Image> GetSkin(string name)
+        public void GetProperties()
         {
+            var request = HttpWebRequest.Create("https://sessionserver.mojang.com/session/minecraft/profile/" + loginData.selectedProfile.id);
+            request.Method = "GET";
+
+            try
+            {
+                var response = (HttpWebResponse)request.GetResponse();
+                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                dynamic property = JsonConvert.DeserializeObject(responseString);
+                string base64String = property.properties[0].value;
+                var base64EncodedBytes = System.Convert.FromBase64String(base64String);
+                string value = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+                loginData.selectedProfile.properties = JsonConvert.DeserializeObject<ProfileProperties>(value);
+            }
+            catch (WebException e)
+            {
+                //return e.ToString();
+            }
+
+            /*
             var request = await client.GetAsync(uuidApi + name);
 
             if (request.StatusCode == HttpStatusCode.OK)
@@ -66,6 +86,7 @@ namespace MinecraftHeads
                 }
             } 
             return new Image() { Source = null};
+            */
         }
 
         public async Task<Image> GetImage()
@@ -112,15 +133,16 @@ namespace MinecraftHeads
                 }
                 var response = (HttpWebResponse)request.GetResponse();
                 var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-
-                fileHandler.SaveLogin(responseString);
+                
                 loginData = (Login)jsonHandler.DeserializeJsonString(responseString);
-                GetQuestions();
+                GetProperties();
+                fileHandler.SaveLogin(JsonConvert.SerializeObject(loginData));
                 return responseString;
             }
             catch (WebException e)
             {
-                return e.ToString();
+                //return e.ToString();
+                return null;
             }
         }
 
@@ -218,8 +240,8 @@ namespace MinecraftHeads
             catch (WebException e)
             {
                 //return e.ToString();
+                return null;
             }
-            return null;
         }
         public string SendQuestions(List<Answer> answers)
         {
@@ -248,10 +270,31 @@ namespace MinecraftHeads
             }
         }
 
-        private async void SecureConnection()
+        public bool IsSecure()
         {
-            Response response1 = await new Challenges(auth.AccessToken).PerformRequestAsync();
-            Response response2 = await new SecureIP(auth.AccessToken).PerformRequestAsync();
+            var request = HttpWebRequest.Create("https://api.mojang.com/user/security/location");
+            request.Method = "GET";
+            request.Headers["Authorization"] = "Bearer " + loginData.accessToken;
+
+            try
+            {
+                var response = (HttpWebResponse)request.GetResponse();
+                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                if (responseString == "")
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (WebException e)
+            {
+                //return e.ToString();
+                return false;
+            }
         }
 
         public async Task<Image> ChangeSkin(FileInfo skinPath)

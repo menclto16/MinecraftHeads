@@ -9,8 +9,9 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="LoginPage">
 
-    <Grid VerticalAlignment="Center" Width="200">
+    <Grid VerticalAlignment="Center">
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -18,9 +19,10 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Image Source="/MinecraftHeads;component/Resources/logo.png" Width="100"  Margin="0, 5, 0, 15"></Image>
-        <TextBox x:Name="LoginField" Grid.Row="1" Margin="5" Controls:TextBoxHelper.Watermark="Username/Email..."/>
-        <PasswordBox x:Name="PasswordField" Grid.Row="2" Margin="5" Controls:TextBoxHelper.Watermark="Password..."/>
-        <Button Click="login" Grid.Row="3" Width="100" Margin="5" Controls:ButtonHelper.CornerRadius="15" Content="Login"/>
-        <Controls:ProgressRing x:Name="ProgressRingControl" Grid.Row="4" IsActive="False" Width="30" Height="30" />
+        <TextBox x:Name="LoginField" Grid.Row="1" Width="200" Margin="5" Controls:TextBoxHelper.Watermark="Username/Email..." KeyDown="textBoxKeyDown"/>
+        <PasswordBox x:Name="PasswordField" Grid.Row="2" Width="200" Margin="5" Controls:TextBoxHelper.Watermark="Password..." KeyDown="textBoxKeyDown"/>
+        <Button Click="loginButtonPress" Grid.Row="3" Width="100" Margin="5" Controls:ButtonHelper.CornerRadius="15" Content="Login"/>
+        <TextBlock x:Name="MessageLabel" Grid.Row="4" Foreground="Green" TextAlignment="Center" Text="Please sign in" Height="35"/>
+        <Controls:ProgressRing x:Name="ProgressRingControl" Grid.Row="5" IsActive="False" Width="30" Height="30" />
     </Grid>
 </Page>
