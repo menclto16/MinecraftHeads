@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 using MojangSharp;
 using MojangSharp.Endpoints;
 using MojangSharp.Responses;
-using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using MinecraftHeads.Responses;
 using Newtonsoft.Json;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace MinecraftHeads
 {
@@ -23,11 +24,8 @@ namespace MinecraftHeads
         private static readonly HttpClient client = new HttpClient();
         private JsonHandler jsonHandler = new JsonHandler();
         private FileHandler fileHandler = new FileHandler();
-        private AuthenticateResponse auth;
+        private DrawingHandler drawingHandler = new DrawingHandler();
         private Login loginData;
-
-        private string uuidApi = "https://api.minetools.eu/uuid/";
-        private string headImgApi = "https://crafatar.com/renders/body/";
 
         public APIHandler()
         {
@@ -66,47 +64,32 @@ namespace MinecraftHeads
                 var base64EncodedBytes = System.Convert.FromBase64String(base64String);
                 string value = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
                 loginData.selectedProfile.properties = JsonConvert.DeserializeObject<ProfileProperties>(value);
+                GetSkin();
             }
             catch (WebException e)
             {
                 //return e.ToString();
             }
-
-            /*
-            var request = await client.GetAsync(uuidApi + name);
-
-            if (request.StatusCode == HttpStatusCode.OK)
-            {
-                var response = await request.Content.ReadAsStringAsync();
-                dynamic values = jsonHandler.DeserializeJsonString(response);
-                string uuid = values.id;
-                if (uuid != null)
-                {
-                    return await GetImage();
-                }
-            } 
-            return new Image() { Source = null};
-            */
         }
 
-        public async Task<Image> GetImage()
+        public BitmapImage GetSkin()
         {
-            var request = await client.GetAsync(headImgApi + loginData.selectedProfile.id + "?size=512&default=MHF_Steve&overlay");
-            var response = await request.Content.ReadAsStreamAsync();
+            var request = HttpWebRequest.Create(loginData.selectedProfile.properties.textures.SKIN.url);
+            request.Method = "GET";
 
-            using (var stream = new MemoryStream())
+            try
             {
-                byte[] buffer = new byte[2048];
-                int bytesRead;
-                while ((bytesRead = response.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    stream.Write(buffer, 0, bytesRead);
-                }
-                byte[] result = stream.ToArray();
-                Image image = new Image();
-                image.Source = BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-                return image;
-                //File.WriteAllBytes(uuid + ".png", result);
+                var response = (HttpWebResponse)request.GetResponse();
+
+                Stream response_stream = response.GetResponseStream();
+                Bitmap bitmap = new Bitmap(response_stream);
+                return drawingHandler.ConvertImage(bitmap);
+                //bitmap.Save("cached_skin.png", ImageFormat.Png);
+            }
+            catch (WebException e)
+            {
+                return null;
+                //return e.ToString();
             }
         }
 
@@ -296,11 +279,12 @@ namespace MinecraftHeads
                 return false;
             }
         }
-
+        /*
         public async Task<Image> ChangeSkin(FileInfo skinPath)
         {
             Response skinUpload = await new UploadSkin(auth.AccessToken, auth.SelectedProfile.Value, skinPath).PerformRequestAsync();
             return await GetImage();
         }
+        */
     }
 }

@@ -49,7 +49,7 @@ namespace MinecraftHeads
 
         private async void ChangeSkin(object sender, RoutedEventArgs e)
         {
-            Image image = await apiHandler.ChangeSkin(skinPath);
+            //Image image = await apiHandler.ChangeSkin(skinPath);
             //SkinPreview.Source = image.Source;
         }
         private void checkLogin()

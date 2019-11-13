@@ -40,10 +40,9 @@ namespace MinecraftHeads
                 ((MainWindow)Application.Current.MainWindow).MainFrame.Navigate(App.LoginPageObject);
             }
         }
-        public async void ShowSkin()
+        public void ShowSkin()
         {
-            Image image = await App.APIHandlerObject.GetImage();
-            SkinImage.Source = image.Source;
+            SkinImage.Source = App.APIHandlerObject.GetSkin();
         }
 
         public void ShowQuestions()

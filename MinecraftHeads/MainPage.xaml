@@ -9,7 +9,14 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="MainPage">
-
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                   Source="/Resources/ResourceDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
     <Grid>
         <simpleChildWindow:ChildWindow
             x:Name="QuestionsWindow"
@@ -28,9 +35,28 @@
                 </StackPanel>
             </Border>
         </simpleChildWindow:ChildWindow>
-        <StackPanel Width="400">
-            <Image x:Name="SkinImage" Height="400"></Image>
-            <Button Click="Button_Click">Log Out</Button>
-        </StackPanel>
+        
+        <Controls:MetroAnimatedTabControl>
+            <Controls:MetroTabItem Header="Home">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <StackPanel Width="400">
+                            <Image x:Name="SkinImage" Height="350" Margin="5" RenderOptions.BitmapScalingMode="NearestNeighbor"></Image>
+                        </StackPanel>
+                    </StackPanel>
+                    <Button Click="Button_Click" Grid.Row="1" Width="100" Height="30" Margin="5">Log Out</Button>
+                </Grid>
+            </Controls:MetroTabItem>
+            <Controls:MetroTabItem Header="Gallery"></Controls:MetroTabItem>
+            <Controls:MetroTabItem Header="Skin Search">
+                <StackPanel>
+                    <TextBox Style="{StaticResource SearchMetroTextBox}"></TextBox>
+                </StackPanel>
+            </Controls:MetroTabItem>
+        </Controls:MetroAnimatedTabControl>
     </Grid>
 </Page>
