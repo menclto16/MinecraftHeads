@@ -16,6 +16,7 @@ namespace MinecraftHeads
         public string username { get; set; }
         public string password { get; set; }
         public string clientToken { get; set; }
+
         public Agent agent = new Agent();
         public bool requestUser = true;
     }

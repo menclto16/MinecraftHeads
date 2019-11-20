@@ -11,9 +11,9 @@ namespace MinecraftHeads
 {
     class FileHandler
     {
-        public void SaveLogin(string login)
+        public void SaveFile(string fileName, string stringToSave)
         {
-            File.WriteAllText("login.json", login);
+            File.WriteAllText(fileName, stringToSave);
         }
 
         public Login GetLogin()
