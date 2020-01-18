@@ -50,9 +50,10 @@ namespace MinecraftHeads
                 }
             }
         }
-        public void GetProperties()
+        public dynamic GetProperties(string id)
         {
-            var request = HttpWebRequest.Create("https://sessionserver.mojang.com/session/minecraft/profile/" + loginData.selectedProfile.id);
+            if (!isValidGuid(id)) id = GetUuid(id);
+            var request = HttpWebRequest.Create("https://sessionserver.mojang.com/session/minecraft/profile/" + id);
             request.Method = "GET";
 
             try
@@ -65,17 +66,53 @@ namespace MinecraftHeads
                 var base64EncodedBytes = System.Convert.FromBase64String(base64String);
                 string value = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
                 loginData.selectedProfile.properties = JsonConvert.DeserializeObject<ProfileProperties>(value);
-                fileHandler.SaveFile("cache/profiles/" + loginData.selectedProfile.id + ".json", value);
+                fileHandler.SaveFile("cache/profiles/" + id + ".json", value);
+                return JsonConvert.DeserializeObject<dynamic>(value);
             }
             catch (WebException e)
             {
-                //return e.ToString();
+                return null;
+            }
+        }
+        public string GetUuid(string name)
+        {
+            var request = HttpWebRequest.Create("https://api.mojang.com/profiles/minecraft");
+            var byteData = Encoding.ASCII.GetBytes('"' + name + '"');
+            request.ContentType = "application/json";
+            request.Method = "POST";
+
+            using (var stream = request.GetRequestStream())
+            {
+                stream.Write(byteData, 0, byteData.Length);
+            }
+
+            try
+            {
+                var response = (HttpWebResponse)(request.GetResponse());
+                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                List<dynamic> responseObjectList = JsonConvert.DeserializeObject<List<dynamic>>(responseString);
+                return responseObjectList[0].id;
+            }
+            catch (Exception ex)
+            {
+                throw new SecurityException("Bad credentials", ex);
+                return null;
             }
         }
 
-        public BitmapImage GetSkin()
+        public BitmapImage GetSkin(string id)
         {
-            var request = HttpWebRequest.Create(loginData.selectedProfile.properties.textures.SKIN.url);
+            if (id == null) id = loginData.selectedProfile.id;
+            if (!isValidGuid(id)) id = GetUuid(id);
+            ProfileProperties profileProperties = fileHandler.GetProfile(id);
+            if (profileProperties.textures.SKIN == null)
+            {
+                Bitmap bitmap = new Bitmap("cache/skins/default.png");
+                fileHandler.SaveImage("cache/skins/" + id + ".png", bitmap);
+                return drawingHandler.ConvertImage(bitmap);
+            }
+            var request = HttpWebRequest.Create(profileProperties.textures.SKIN.url);
             request.Method = "GET";
 
             try
@@ -84,8 +121,8 @@ namespace MinecraftHeads
 
                 Stream response_stream = response.GetResponseStream();
                 Bitmap bitmap = new Bitmap(response_stream);
+                fileHandler.SaveImage("cache/skins/" + id + ".png", bitmap);
                 return drawingHandler.ConvertImage(bitmap);
-                //bitmap.Save("cached_skin.png", ImageFormat.Png);
             }
             catch (WebException e)
             {
@@ -129,7 +166,7 @@ namespace MinecraftHeads
             request.ContentType = "application/json";
             request.Method = "POST";
 
-            using (var stream = await request.GetRequestStreamAsync())
+            using (var stream = request.GetRequestStream())
             {
                 stream.Write(byteData, 0, byteData.Length);
             }
@@ -140,7 +177,7 @@ namespace MinecraftHeads
                 var responseString = await new StreamReader(response.GetResponseStream()).ReadToEndAsync();
                 
                 loginData = (Login)jsonHandler.DeserializeJsonString(responseString);
-                GetProperties();
+                GetProperties(loginData.selectedProfile.id);
                 fileHandler.SaveFile("login.json", JsonConvert.SerializeObject(loginData, Formatting.Indented));
                 App.MainPageObject.UpdatePage();
                 return responseString;
@@ -302,6 +339,13 @@ namespace MinecraftHeads
                 //return e.ToString();
                 return false;
             }
+        }
+
+        private bool isValidGuid(string id)
+        {
+            Guid guid = new Guid();
+            bool isValid = Guid.TryParse(id, out guid);
+            return isValid;
         }
         /*
         public async Task<Image> ChangeSkin(FileInfo skinPath)

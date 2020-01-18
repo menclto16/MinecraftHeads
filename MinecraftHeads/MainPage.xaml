@@ -38,7 +38,19 @@
                 </StackPanel>
             </Border>
         </simpleChildWindow:ChildWindow>
-        
+        <simpleChildWindow:ChildWindow
+            x:Name="SaveSkinWindow"
+            Title="Save Skin"
+            ChildWindowWidth="400"
+            EnableDropShadow="False">
+            <Border BorderThickness="15">
+                <StackPanel>
+                    <Label x:Name="SkinName" Content="Skin name"/>
+                    <TextBox x:Name="SkinNameTextBox"/>
+                    <Button Content="Submit" HorizontalAlignment="Center" Margin="10" Click="SaveSkin"/>
+                </StackPanel>
+            </Border>
+        </simpleChildWindow:ChildWindow>
         <Controls:MetroAnimatedTabControl>
             <Controls:MetroTabItem Header="Home">
                 <Grid>
@@ -54,11 +66,25 @@
                     <Button Click="Button_Click" Grid.Row="1" Width="100" Height="30" Margin="5">Log Out</Button>
                 </Grid>
             </Controls:MetroTabItem>
-            <Controls:MetroTabItem Header="Gallery"></Controls:MetroTabItem>
+            <Controls:MetroTabItem Header="Gallery">
+                <WrapPanel x:Name="SkinWrapPanel">
+                </WrapPanel>
+            </Controls:MetroTabItem>
             <Controls:MetroTabItem Header="Skin Search">
-                <StackPanel>
-                    <TextBox Style="{StaticResource SearchMetroTextBox}" Width="500" Margin="5" Controls:TextBoxHelper.ButtonCommand="ApplicationCommands.New"></TextBox>
-                </StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBox x:Name="SearchBox" Style="{StaticResource SearchMetroTextBox}" Width="500" Margin="5" Controls:TextBoxHelper.ButtonCommand="ApplicationCommands.New"></TextBox>
+                    <Image x:Name="SearchSkinImage" Grid.Row="1" Margin="5" RenderOptions.BitmapScalingMode="NearestNeighbor"></Image>
+                    <Label x:Name="ProfileName" Grid.Row="2" HorizontalAlignment="Center" FontSize="16"/>
+                    <Label x:Name="ProfileUuid" Grid.Row="3" HorizontalAlignment="Center" FontSize="10"/>
+                    <Button x:Name="SaveSkinButton" Grid.Row="4" Click="ShowSaveSkinWindow" Width="150" Visibility="Hidden" Margin="5">Save</Button>
+                </Grid>
             </Controls:MetroTabItem>
         </Controls:MetroAnimatedTabControl>
     </Grid>

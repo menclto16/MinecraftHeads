@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MahApps.Metro.SimpleChildWindow;
 using MahApps.Metro.Controls;
+using MinecraftHeads.Responses;
+using System.Drawing;
 
 namespace MinecraftHeads
 {
@@ -31,6 +33,7 @@ namespace MinecraftHeads
         public void UpdatePage()
         {
             ShowSkin();
+            loadSavedSkins();
             if (!App.APIHandlerObject.IsSecure()) ShowQuestions();
         }
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -42,7 +45,7 @@ namespace MinecraftHeads
         }
         public void ShowSkin()
         {
-            SkinImage.Source = App.APIHandlerObject.GetSkin();
+            SkinImage.Source = App.APIHandlerObject.GetSkin(null);
         }
 
         public void ShowQuestions()
@@ -52,6 +55,29 @@ namespace MinecraftHeads
             Question2.Content = questions[1].question.question;
             Question3.Content = questions[2].question.question;
             QuestionsWindow.IsOpen = true;
+        }
+
+        private void loadSavedSkins()
+        {
+            SkinWrapPanel.Children.Clear();
+            List<SavedSkin> savedSkins = new FileHandler().GetSavedSkins();
+            foreach (var savedSkin in savedSkins)
+            {
+                Tile tile = new Tile();
+                BitmapImage bitmapImage = new DrawingHandler().ConvertImage(savedSkin.Bitmap);
+                System.Windows.Controls.Image image = new System.Windows.Controls.Image();
+                image.Source = bitmapImage;
+                image.Width = 55;
+                RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.NearestNeighbor);
+                Label label = new Label();
+                label.Content = savedSkin.SkinName;
+                label.HorizontalAlignment = HorizontalAlignment.Center;
+                StackPanel stackPanel = new StackPanel();
+                stackPanel.Children.Add(image);
+                stackPanel.Children.Add(label);
+                tile.Content = stackPanel;
+                SkinWrapPanel.Children.Add(tile);
+            }
         }
 
         private void SendAnswers(object sender, RoutedEventArgs e)
@@ -78,7 +104,24 @@ namespace MinecraftHeads
         }
         private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            App.APIHandlerObject.GetSkin();
+            dynamic profileProperties = App.APIHandlerObject.GetProperties(SearchBox.Text);
+            ProfileName.Content = profileProperties.profileName;
+            ProfileUuid.Content = profileProperties.profileId;
+            SearchSkinImage.Source = App.APIHandlerObject.GetSkin(SearchBox.Text);
+            SaveSkinButton.Visibility = Visibility.Visible;
+        }
+
+        private void ShowSaveSkinWindow(object sender, RoutedEventArgs e)
+        {
+            SaveSkinWindow.IsOpen = true;
+        }
+
+        private void SaveSkin(object sender, RoutedEventArgs e)
+        {
+            new FileHandler().SaveSkin(ProfileUuid.Content.ToString(), SkinNameTextBox.Text);
+            SaveSkinWindow.IsOpen = false;
+            SkinNameTextBox.Text = "";
+            UpdatePage();
         }
     }
 }

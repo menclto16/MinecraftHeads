@@ -86,6 +86,7 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SavedSkin.cs" />
     <Compile Include="uuidResponse.cs" />
     <Page Include="LoginPage.xaml">
       <SubType>Designer</SubType>
@@ -161,6 +162,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="cache\profiles\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="cache\skins\default.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
