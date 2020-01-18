@@ -24,7 +24,6 @@ namespace MinecraftHeads
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        private APIHandler apiHandler = new APIHandler();
         private FileInfo skinPath;
 
         public MainWindow()
