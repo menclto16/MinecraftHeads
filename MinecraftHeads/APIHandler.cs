@@ -14,6 +14,7 @@ using MinecraftHeads.Responses;
 using Newtonsoft.Json;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Security;
 
 namespace MinecraftHeads
 {
@@ -64,7 +65,7 @@ namespace MinecraftHeads
                 var base64EncodedBytes = System.Convert.FromBase64String(base64String);
                 string value = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
                 loginData.selectedProfile.properties = JsonConvert.DeserializeObject<ProfileProperties>(value);
-                GetSkin();
+                fileHandler.SaveFile("cache/profiles/" + loginData.selectedProfile.id + ".json", value);
             }
             catch (WebException e)
             {
@@ -113,7 +114,7 @@ namespace MinecraftHeads
             }
         }
 
-        public string Login(string login, string password)
+        public async Task<string> Login(string login, string password)
         {
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.username = login;
@@ -128,23 +129,25 @@ namespace MinecraftHeads
             request.ContentType = "application/json";
             request.Method = "POST";
 
+            using (var stream = await request.GetRequestStreamAsync())
+            {
+                stream.Write(byteData, 0, byteData.Length);
+            }
+
             try
             {
-                using (var stream = request.GetRequestStream())
-                {
-                    stream.Write(byteData, 0, byteData.Length);
-                }
-                var response = (HttpWebResponse)request.GetResponse();
-                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+                var response = (HttpWebResponse)(await request.GetResponseAsync());
+                var responseString = await new StreamReader(response.GetResponseStream()).ReadToEndAsync();
                 
                 loginData = (Login)jsonHandler.DeserializeJsonString(responseString);
                 GetProperties();
-                fileHandler.SaveLogin(JsonConvert.SerializeObject(loginData));
+                fileHandler.SaveFile("login.json", JsonConvert.SerializeObject(loginData, Formatting.Indented));
+                App.MainPageObject.UpdatePage();
                 return responseString;
             }
-            catch (WebException e)
+            catch (Exception ex)
             {
-                //return e.ToString();
+                throw new SecurityException("Bad credentials", ex);
                 return null;
             }
         }
@@ -192,7 +195,7 @@ namespace MinecraftHeads
                 var response = (HttpWebResponse)request.GetResponse();
                 var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
 
-                fileHandler.SaveLogin(responseString);
+                fileHandler.SaveFile("login.json", responseString);
                 return responseString;
             }
             catch (WebException e)

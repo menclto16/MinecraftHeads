@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MahApps.Metro.Controls.Dialogs;
 
 namespace MinecraftHeads
 {
@@ -24,9 +25,10 @@ namespace MinecraftHeads
         {
             InitializeComponent();
         }
-        private void login()
+        private async void login()
         {
-            if (App.APIHandlerObject.Login(LoginField.Text, PasswordField.Password) != null)
+            ((MainWindow)Application.Current.MainWindow).ShowLoadingDialog();
+            if (await App.APIHandlerObject.Login(LoginField.Text, PasswordField.Password) != null)
             {
                 ((MainWindow)Application.Current.MainWindow).MainFrame.Navigate(App.MainPageObject);
                 App.MainPageObject.UpdatePage();
@@ -36,6 +38,7 @@ namespace MinecraftHeads
                 MessageLabel.Text = "Login failed.\nPlease check your credentials or try again later.";
                 MessageLabel.Foreground = Brushes.Red;
             }
+            ((MainWindow)Application.Current.MainWindow).HideLoadingDialog();
         }
         private void loginButtonPress(object sender, RoutedEventArgs e)
         {

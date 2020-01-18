@@ -16,6 +16,8 @@ using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 using Microsoft.Win32;
 using MojangSharp.Responses;
+using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.SimpleChildWindow;
 
 namespace MinecraftHeads
 {
@@ -62,6 +64,16 @@ namespace MinecraftHeads
             {
                 MainFrame.Navigate(App.LoginPageObject);
             }
+        }
+
+        public async void ShowLoadingDialog()
+        {
+            await ((MahApps.Metro.Controls.MetroWindow)Application.Current.MainWindow).ShowChildWindowAsync(LoadingWindow);
+            //LoadingWindow.IsOpen = !LoadingWindow.IsOpen;
+        }
+        public void HideLoadingDialog()
+        {
+            LoadingWindow.IsOpen = !LoadingWindow.IsOpen;
         }
     }
 }
