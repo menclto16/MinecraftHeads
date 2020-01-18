@@ -92,6 +92,26 @@ namespace MinecraftHeads
                 //return e.ToString();
             }
         }
+        public BitmapImage FindSkin()
+        {
+            var request = HttpWebRequest.Create(loginData.selectedProfile.properties.textures.SKIN.url);
+            request.Method = "GET";
+
+            try
+            {
+                var response = (HttpWebResponse)request.GetResponse();
+
+                Stream response_stream = response.GetResponseStream();
+                Bitmap bitmap = new Bitmap(response_stream);
+                return drawingHandler.ConvertImage(bitmap);
+                //bitmap.Save("cached_skin.png", ImageFormat.Png);
+            }
+            catch (WebException e)
+            {
+                return null;
+                //return e.ToString();
+            }
+        }
 
         public string Login(string login, string password)
         {
@@ -249,7 +269,8 @@ namespace MinecraftHeads
             }
             catch (WebException e)
             {
-                return e.ToString();
+                return null;
+                //return e.ToString();
             }
         }
 

@@ -17,6 +17,9 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
+    <Page.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.New" Executed="NewCommand_Executed" CanExecute="NewCommand_CanExecute" />
+    </Page.CommandBindings>
     <Grid>
         <simpleChildWindow:ChildWindow
             x:Name="QuestionsWindow"
@@ -54,7 +57,7 @@
             <Controls:MetroTabItem Header="Gallery"></Controls:MetroTabItem>
             <Controls:MetroTabItem Header="Skin Search">
                 <StackPanel>
-                    <TextBox Style="{StaticResource SearchMetroTextBox}"></TextBox>
+                    <TextBox Style="{StaticResource SearchMetroTextBox}" Width="500" Margin="5" Controls:TextBoxHelper.ButtonCommand="ApplicationCommands.New"></TextBox>
                 </StackPanel>
             </Controls:MetroTabItem>
         </Controls:MetroAnimatedTabControl>

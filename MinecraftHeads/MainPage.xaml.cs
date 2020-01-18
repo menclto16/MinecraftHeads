@@ -66,8 +66,19 @@ namespace MinecraftHeads
             answers[1].id = questions[1].answer.id;
             answers[2].answer = Answer3.Text;
             answers[2].id = questions[2].answer.id;
-            App.APIHandlerObject.SendQuestions(answers);
-            UpdatePage();
+            if (App.APIHandlerObject.SendQuestions(answers) != null)
+            {
+                QuestionsWindow.IsOpen = false;
+                UpdatePage();
+            }
+        }
+        private void NewCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+        private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            App.APIHandlerObject.GetSkin();
         }
     }
 }
