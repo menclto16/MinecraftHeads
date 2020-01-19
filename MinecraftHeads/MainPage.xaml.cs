@@ -30,22 +30,39 @@ namespace MinecraftHeads
         {
             InitializeComponent();
         }
-        public void UpdatePage()
+        public void UpdateMainPage()
         {
             ShowSkin();
-            loadSavedSkins();
             if (!App.APIHandlerObject.IsSecure()) ShowQuestions();
         }
-        private void Button_Click(object sender, RoutedEventArgs e)
+        public void UpdateGalleryPage()
+        {
+            loadSavedSkins();
+        }
+        private void LogOut(object sender, RoutedEventArgs e)
         {
             if (App.APIHandlerObject.Invalidate() == "")
             {
                 ((MainWindow)Application.Current.MainWindow).MainFrame.Navigate(App.LoginPageObject);
             }
         }
+        private void ChangeSkin(object sender, RoutedEventArgs e)
+        {
+            string value = App.APIHandlerObject.UploadSkin(null);
+            if (value != null)
+            {
+                ErrorLabel.Content = "There was an error uploading your skin";
+                ErrorDetailTextBlock.Text = value;
+                ErrorWindow.IsOpen = true;
+            }
+            else
+            {
+                UpdateMainPage();
+            }
+        }
         public void ShowSkin()
         {
-            SkinImage.Source = App.APIHandlerObject.GetSkin(null);
+            SkinImage.Source = new DrawingHandler().ConvertImage(new Bitmap("cache/skins/current.png"));
         }
 
         public void ShowQuestions()
@@ -63,19 +80,11 @@ namespace MinecraftHeads
             List<SavedSkin> savedSkins = new FileHandler().GetSavedSkins();
             foreach (var savedSkin in savedSkins)
             {
-                Tile tile = new Tile();
+                SkinTile tile = new SkinTile();
                 BitmapImage bitmapImage = new DrawingHandler().ConvertImage(savedSkin.Bitmap);
-                System.Windows.Controls.Image image = new System.Windows.Controls.Image();
-                image.Source = bitmapImage;
-                image.Width = 55;
-                RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.NearestNeighbor);
-                Label label = new Label();
-                label.Content = savedSkin.SkinName;
-                label.HorizontalAlignment = HorizontalAlignment.Center;
-                StackPanel stackPanel = new StackPanel();
-                stackPanel.Children.Add(image);
-                stackPanel.Children.Add(label);
-                tile.Content = stackPanel;
+                savedSkin.Bitmap.Dispose();
+                tile.SkinImage.Source = bitmapImage;
+                tile.SkinName.Content = savedSkin.SkinName;
                 SkinWrapPanel.Children.Add(tile);
             }
         }
@@ -95,7 +104,7 @@ namespace MinecraftHeads
             if (App.APIHandlerObject.SendQuestions(answers) != null)
             {
                 QuestionsWindow.IsOpen = false;
-                UpdatePage();
+                UpdateMainPage();
             }
         }
         private void NewCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -105,23 +114,87 @@ namespace MinecraftHeads
         private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             dynamic profileProperties = App.APIHandlerObject.GetProperties(SearchBox.Text);
-            ProfileName.Content = profileProperties.profileName;
-            ProfileUuid.Content = profileProperties.profileId;
-            SearchSkinImage.Source = App.APIHandlerObject.GetSkin(SearchBox.Text);
-            SaveSkinButton.Visibility = Visibility.Visible;
+            if (profileProperties == null)
+            {
+                ErrorLabel.Content = "Not Found";
+                ErrorDetailTextBlock.Text = "User with name/uuid '" + SearchBox.Text + "' was not found...";
+                ErrorWindow.IsOpen = true;
+            }
+            else
+            {
+                ProfileName.Content = profileProperties.profileName;
+                ProfileUuid.Content = profileProperties.profileId;
+                SearchSkinImage.Source = App.APIHandlerObject.GetSkin(ProfileUuid.Content.ToString());
+                SaveSkinButton.Visibility = Visibility.Visible;
+            }
         }
 
         private void ShowSaveSkinWindow(object sender, RoutedEventArgs e)
         {
+            SaveSkinMessage.Content = "";
             SaveSkinWindow.IsOpen = true;
         }
 
+        private void ToggleErrorWindow(object sender, RoutedEventArgs e)
+        {
+            ErrorWindow.IsOpen = !ErrorWindow.IsOpen;
+        }
+        private void ToggleSaveSkinWindow(object sender, RoutedEventArgs e)
+        {
+            SaveSkinWindow.IsOpen = !SaveSkinWindow.IsOpen;
+        }
+        private void ToggleRenameSkinWindow(object sender, RoutedEventArgs e)
+        {
+            RenameSkinWindow.IsOpen = !RenameSkinWindow.IsOpen;
+        }
         private void SaveSkin(object sender, RoutedEventArgs e)
         {
-            new FileHandler().SaveSkin(ProfileUuid.Content.ToString(), SkinNameTextBox.Text);
-            SaveSkinWindow.IsOpen = false;
-            SkinNameTextBox.Text = "";
-            UpdatePage();
+            if (new FileHandler().SaveSkin(ProfileUuid.Content.ToString(), SkinNameTextBox.Text))
+            {
+                SaveSkinWindow.IsOpen = false;
+                SkinNameTextBox.Text = "";
+                UpdateGalleryPage();
+            }
+            else
+            {
+                SaveSkinMessage.Content = "Skin name already exists";
+            }
+        }
+        private void AddSkin(object sender, RoutedEventArgs e)
+        {
+            if (new FileHandler().SaveImage("skinlib/" + AddSkinNameTextBox.Text + ".png", new Bitmap(HiddenSkinPath.Content.ToString())))
+            {
+                AddSkinWindow.IsOpen = false;
+                AddSkinNameTextBox.Text = "";
+                UpdateGalleryPage();
+            }
+            else
+            {
+                AddSkinMessage.Content = "Skin name already exists";
+            }
+        }
+        private void ShowAddSkinWindow(object sender, RoutedEventArgs e)
+        {
+            string skinPath = new FileHandler().GetSkinPath();
+            if (skinPath != null)
+            {
+                AddSkinMessage.Content = "";
+                HiddenSkinPath.Content = skinPath;
+                AddSkinWindow.IsOpen = true;
+            }
+        }
+        public void ShowRenameSkinWindow(string skinName)
+        {
+            RenameSkinWindow.Title = "Rename '" + skinName + "'";
+            RenameSkinOldName.Content = skinName;
+            RenameSkinWindow.IsOpen = true;
+        }
+
+        private void RenameSkin(object sender, RoutedEventArgs e)
+        {
+            new FileHandler().RenameSkin("skinlib/" + RenameSkinOldName.Content + ".png", "skinlib/" + SkinRenameNameTextBox.Text + ".png");
+            UpdateGalleryPage();
+            RenameSkinWindow.IsOpen = false;
         }
     }
 }

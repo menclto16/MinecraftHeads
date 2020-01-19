@@ -43,11 +43,72 @@
             Title="Save Skin"
             ChildWindowWidth="400"
             EnableDropShadow="False">
+            <simpleChildWindow:ChildWindow.OverlayBrush>
+                <SolidColorBrush Opacity="0.7" Color="Black" />
+            </simpleChildWindow:ChildWindow.OverlayBrush>
             <Border BorderThickness="15">
                 <StackPanel>
                     <Label x:Name="SkinName" Content="Skin name"/>
                     <TextBox x:Name="SkinNameTextBox"/>
-                    <Button Content="Submit" HorizontalAlignment="Center" Margin="10" Click="SaveSkin"/>
+                    <Label x:Name="SaveSkinMessage" Foreground="Green" HorizontalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Submit" Margin="10" Click="SaveSkin"/>
+                        <Button Content="Cancel" Margin="10" Click="ToggleSaveSkinWindow"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </simpleChildWindow:ChildWindow>
+        <simpleChildWindow:ChildWindow
+            x:Name="AddSkinWindow"
+            Title="Add Skin"
+            ChildWindowWidth="400"
+            EnableDropShadow="False">
+            <simpleChildWindow:ChildWindow.OverlayBrush>
+                <SolidColorBrush Opacity="0.7" Color="Black" />
+            </simpleChildWindow:ChildWindow.OverlayBrush>
+            <Border BorderThickness="15">
+                <StackPanel>
+                    <Label x:Name="AddSkinName" Content="Skin name"/>
+                    <TextBox x:Name="AddSkinNameTextBox"/>
+                    <Label x:Name="AddSkinMessage" Foreground="Green" HorizontalAlignment="Center"/>
+                    <Label x:Name="HiddenSkinPath" Visibility="Collapsed"/>
+                    <Button Content="Submit" HorizontalAlignment="Center" Margin="10" Click="AddSkin"/>
+                </StackPanel>
+            </Border>
+        </simpleChildWindow:ChildWindow>
+        <simpleChildWindow:ChildWindow
+            x:Name="RenameSkinWindow"
+            Title="Rename Skin"
+            ChildWindowWidth="400"
+            EnableDropShadow="False">
+            <simpleChildWindow:ChildWindow.OverlayBrush>
+                <SolidColorBrush Opacity="0.7" Color="Black" />
+            </simpleChildWindow:ChildWindow.OverlayBrush>
+            <Border BorderThickness="15">
+                <StackPanel>
+                    <Label x:Name="SkinRenameName" Content="Skin name"/>
+                    <TextBox x:Name="SkinRenameNameTextBox"/>
+                    <Label x:Name="RenameSkinOldName" Visibility="Hidden"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Submit" Margin="10" Click="RenameSkin"/>
+                        <Button Content="Cancel" Margin="10" Click="ToggleRenameSkinWindow"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </simpleChildWindow:ChildWindow>
+        <simpleChildWindow:ChildWindow
+            x:Name="ErrorWindow"
+            Title="Error"
+            ChildWindowWidth="400"
+            EnableDropShadow="False">
+            <simpleChildWindow:ChildWindow.OverlayBrush>
+                <SolidColorBrush Opacity="0.7" Color="Black" />
+            </simpleChildWindow:ChildWindow.OverlayBrush>
+            <Border BorderThickness="15">
+                <StackPanel>
+                    <Label x:Name="ErrorLabel"/>
+                    <TextBlock x:Name="ErrorDetailTextBlock" FontSize="10" TextWrapping="Wrap" Foreground="Gray"/>
+                    <Button Content="OK" HorizontalAlignment="Center" Margin="10" Width="75" Click="ToggleErrorWindow"/>
                 </StackPanel>
             </Border>
         </simpleChildWindow:ChildWindow>
@@ -58,17 +119,25 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Orientation="Horizontal">
-                        <StackPanel Width="400">
-                            <Image x:Name="SkinImage" Height="350" Margin="5" RenderOptions.BitmapScalingMode="NearestNeighbor"></Image>
-                        </StackPanel>
+                    <Image x:Name="SkinImage" Grid.Row="0" Margin="5" RenderOptions.BitmapScalingMode="NearestNeighbor"></Image>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Click="ChangeSkin" Width="100" Height="30" Margin="0, 5, 40, 5">Change Skin</Button>
+                        <Button Click="LogOut" Width="100" Height="30" Margin="40, 5, 0, 5">Log Out</Button>
                     </StackPanel>
-                    <Button Click="Button_Click" Grid.Row="1" Width="100" Height="30" Margin="5">Log Out</Button>
                 </Grid>
             </Controls:MetroTabItem>
             <Controls:MetroTabItem Header="Gallery">
-                <WrapPanel x:Name="SkinWrapPanel">
-                </WrapPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <WrapPanel x:Name="SkinWrapPanel" MinWidth="250">
+                        </WrapPanel>
+                    </ScrollViewer>
+                    <Button Grid.Row="1" Click="ShowAddSkinWindow" Width="150" Margin="5">Add Skin</Button>
+                </Grid>
             </Controls:MetroTabItem>
             <Controls:MetroTabItem Header="Skin Search">
                 <Grid>

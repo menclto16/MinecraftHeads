@@ -96,15 +96,16 @@ namespace MinecraftHeads
             }
             catch (Exception ex)
             {
-                throw new SecurityException("Bad credentials", ex);
                 return null;
             }
         }
 
         public BitmapImage GetSkin(string id)
         {
-            if (id == null) id = loginData.selectedProfile.id;
-            if (!isValidGuid(id)) id = GetUuid(id);
+            if (id == null)
+            {
+                id = loginData.selectedProfile.id;
+            }
             ProfileProperties profileProperties = fileHandler.GetProfile(id);
             if (profileProperties.textures.SKIN == null)
             {
@@ -121,7 +122,15 @@ namespace MinecraftHeads
 
                 Stream response_stream = response.GetResponseStream();
                 Bitmap bitmap = new Bitmap(response_stream);
-                fileHandler.SaveImage("cache/skins/" + id + ".png", bitmap);
+                if (id == loginData.selectedProfile.id)
+                {
+                    fileHandler.SaveImage("cache/skins/current.png", bitmap);
+                }
+                else
+                {
+                    fileHandler.SaveImage("cache/skins/" + id + ".png", bitmap);
+                }
+                
                 return drawingHandler.ConvertImage(bitmap);
             }
             catch (WebException e)
@@ -130,24 +139,75 @@ namespace MinecraftHeads
                 //return e.ToString();
             }
         }
-        public BitmapImage FindSkin()
-        {
-            var request = HttpWebRequest.Create(loginData.selectedProfile.properties.textures.SKIN.url);
-            request.Method = "GET";
 
+        public string UploadSkin(string fileName)
+        {
+            if (fileName == null)
+            {
+                fileName = fileHandler.GetSkinPath();
+                if (fileName == null) return "Closed";
+            }
+
+            string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+            byte[] boundarybytes = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "\r\n");
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://api.mojang.com/user/profile/" + loginData.selectedProfile.id + "/skin");
+            request.ContentType = "multipart/form-data; boundary=" + boundary;
+            request.Method = "PUT";
+            request.Headers["Authorization"] = "Bearer " + loginData.accessToken;
+            request.KeepAlive = true;
+            request.Credentials = System.Net.CredentialCache.DefaultCredentials;
+
+            Stream rs = request.GetRequestStream();
+
+            rs.Write(boundarybytes, 0, boundarybytes.Length);
+
+            string formdataTemplate = "Content-Disposition: form-data; name=\"model\"\r\n\r\n{0}";
+            string formitem = string.Format(formdataTemplate, "");
+            byte[] formitembytes = System.Text.Encoding.UTF8.GetBytes(formitem);
+            rs.Write(formitembytes, 0, formitembytes.Length);
+
+            rs.Write(boundarybytes, 0, boundarybytes.Length);
+
+            string headerTemplate = "Content-Disposition: form-data; name=\"file\"; filename=\"{0}\"\r\nContent-Type: {1}\r\n\r\n";
+            string header = string.Format(headerTemplate, fileName, "image/png");
+            byte[] headerbytes = System.Text.Encoding.UTF8.GetBytes(header);
+            rs.Write(headerbytes, 0, headerbytes.Length);
+
+            FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            byte[] buffer = new byte[4096];
+            int bytesRead = 0;
+            while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
+            {
+                rs.Write(buffer, 0, bytesRead);
+            }
+            fileStream.Close();
+
+            byte[] trailer = System.Text.Encoding.ASCII.GetBytes("\r\n--" + boundary + "--\r\n");
+            rs.Write(trailer, 0, trailer.Length);
+            rs.Close();
+
+            WebResponse wresp = null;
             try
             {
-                var response = (HttpWebResponse)request.GetResponse();
-
-                Stream response_stream = response.GetResponseStream();
-                Bitmap bitmap = new Bitmap(response_stream);
-                return drawingHandler.ConvertImage(bitmap);
-                //bitmap.Save("cached_skin.png", ImageFormat.Png);
-            }
-            catch (WebException e)
-            {
+                wresp = request.GetResponse();
+                Stream stream2 = wresp.GetResponseStream();
+                StreamReader reader2 = new StreamReader(stream2);
+                fileHandler.SaveImage("cache/skins/current.png", new Bitmap(fileName));
                 return null;
-                //return e.ToString();
+            }
+            catch (Exception ex)
+            {
+                if (wresp != null)
+                {
+                    wresp.Close();
+                    wresp = null;
+                }
+                return ex.ToString();
+            }
+            finally
+            {
+                request = null;
             }
         }
 
@@ -179,7 +239,7 @@ namespace MinecraftHeads
                 loginData = (Login)jsonHandler.DeserializeJsonString(responseString);
                 GetProperties(loginData.selectedProfile.id);
                 fileHandler.SaveFile("login.json", JsonConvert.SerializeObject(loginData, Formatting.Indented));
-                App.MainPageObject.UpdatePage();
+                App.MainPageObject.UpdateMainPage();
                 return responseString;
             }
             catch (Exception ex)

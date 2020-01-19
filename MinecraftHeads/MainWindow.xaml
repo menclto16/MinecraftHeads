@@ -8,23 +8,23 @@
         xmlns:local="clr-namespace:MinecraftHeads"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/shared" x:Class="MinecraftHeads.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
-        MinHeight="350" MinWidth="200">
+        Title="Minecraft Skin Manager" Height="500" Width="600"
+        MinHeight="400" MinWidth="600">
     <Grid>
         <simpleChildWindow:ChildWindow
                                x:Name="LoadingWindow"
-                               Title="Overlay with Opacity"
+                               Title=""
                                Padding="15"
                                d:DesignHeight="300"
                                d:DesignWidth="300"
                                mc:Ignorable="d">
 
             <simpleChildWindow:ChildWindow.OverlayBrush>
-                <SolidColorBrush Opacity="0.8" Color="{StaticResource Gray2}" />
+                <SolidColorBrush Opacity="0.7" Color="Black" />
             </simpleChildWindow:ChildWindow.OverlayBrush>
 
             <StackPanel Margin="20">
-                <Controls:ProgressRing x:Name="ProgressRingControl" Grid.Row="5" IsActive="True" Width="50" Height="50" />
+                <Controls:ProgressRing x:Name="ProgressRingControl" IsActive="True" Width="50" Height="50" />
             </StackPanel>
         </simpleChildWindow:ChildWindow>
         <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>

@@ -7,6 +7,7 @@ using System.IO;
 using Newtonsoft.Json;
 using MinecraftHeads.Responses;
 using System.Drawing;
+using Microsoft.Win32;
 
 namespace MinecraftHeads
 {
@@ -18,10 +19,15 @@ namespace MinecraftHeads
             File.WriteAllText(fileName, stringToSave);
         }
 
-        public void SaveImage(string fileName, Bitmap image)
+        public bool SaveImage(string fileName, Bitmap image)
         {
+            if (fileName != "cache/skins/current.png")
+            {
+                if (File.Exists(fileName)) return false;
+            }
             new FileInfo(fileName).Directory.Create();
             image.Save(fileName);
+            return true;
         }
 
         public Login GetLogin()
@@ -51,12 +57,29 @@ namespace MinecraftHeads
             }
             else return null;
         }
-
-        public void SaveSkin(string id, string name)
+        public bool SaveSkin(string id, string name)
         {
             string path = "skinlib/" + name + ".png";
+            if (File.Exists(path)) return false;
             new FileInfo(path).Directory.Create();
             File.Copy("cache/skins/" + id + ".png", path);
+            return true;
+        }
+        public void RenameSkin(string oldFileName, string newFileName)
+        {
+            File.Move(oldFileName, newFileName);
+        }
+
+        public void DeleteSkin(string path)
+        {
+            File.Delete(path);
+        }
+
+        public string GetSkinPath()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true) return openFileDialog.FileName;
+            return null;
         }
 
         public List<SavedSkin> GetSavedSkins()
@@ -70,11 +93,6 @@ namespace MinecraftHeads
                 savedSkins.Add(savedSkin);
             }
             return savedSkins;
-        }
-
-        public Login DeserializeJsonString(string json)
-        {
-            return JsonConvert.DeserializeObject<Login>(json);
         }
     }
 }

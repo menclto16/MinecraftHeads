@@ -58,7 +58,8 @@ namespace MinecraftHeads
             if (App.APIHandlerObject.LoggedIn)
             {
                 MainFrame.Navigate(App.MainPageObject);
-                App.MainPageObject.UpdatePage();
+                App.MainPageObject.UpdateMainPage();
+                App.MainPageObject.UpdateGalleryPage();
             }
             else
             {

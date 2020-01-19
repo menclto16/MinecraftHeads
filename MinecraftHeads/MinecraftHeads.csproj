@@ -75,6 +75,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Answer.cs" />
+    <Compile Include="CustomCommands.cs" />
     <Compile Include="DrawingHandler.cs" />
     <Compile Include="LoginRequest.cs" />
     <Compile Include="FileHandler.cs" />
@@ -87,6 +88,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="SavedSkin.cs" />
+    <Compile Include="SkinTile.xaml.cs">
+      <DependentUpon>SkinTile.xaml</DependentUpon>
+    </Compile>
     <Compile Include="uuidResponse.cs" />
     <Page Include="LoginPage.xaml">
       <SubType>Designer</SubType>
@@ -110,6 +114,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SkinTile.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Resource Include="Resources\ResourceDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

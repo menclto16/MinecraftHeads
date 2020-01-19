@@ -31,7 +31,7 @@ namespace MinecraftHeads
             if (await App.APIHandlerObject.Login(LoginField.Text, PasswordField.Password) != null)
             {
                 ((MainWindow)Application.Current.MainWindow).MainFrame.Navigate(App.MainPageObject);
-                App.MainPageObject.UpdatePage();
+                App.MainPageObject.UpdateMainPage();
             }
             else
             {
