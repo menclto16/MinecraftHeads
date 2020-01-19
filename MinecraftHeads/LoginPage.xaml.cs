@@ -27,6 +27,7 @@ namespace MinecraftHeads
         }
         private async void login()
         {
+            if (LoginField.Text == "" | PasswordField.Password == "") return;
             ((MainWindow)Application.Current.MainWindow).ShowLoadingDialog();
             if (await App.APIHandlerObject.Login(LoginField.Text, PasswordField.Password) != null)
             {

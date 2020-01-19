@@ -238,13 +238,14 @@ namespace MinecraftHeads
                 
                 loginData = (Login)jsonHandler.DeserializeJsonString(responseString);
                 GetProperties(loginData.selectedProfile.id);
+                GetSkin(null);
                 fileHandler.SaveFile("login.json", JsonConvert.SerializeObject(loginData, Formatting.Indented));
                 App.MainPageObject.UpdateMainPage();
                 return responseString;
             }
             catch (Exception ex)
             {
-                throw new SecurityException("Bad credentials", ex);
+                //throw new SecurityException("Bad credentials", ex);
                 return null;
             }
         }
